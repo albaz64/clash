@@ -68,7 +68,6 @@ We provide pre-built images of Clash and Clash Premium. Therefore you can deploy
 This setup will not work on macOS systems due to the lack of [host networking and TUN support](https://github.com/Dreamacro/clash/issues/770#issuecomment-650951876) in Docker for Mac.
 :::
 
-
 ::: code-group
 
 ```yaml [Clash]
@@ -170,7 +169,7 @@ start_precmd="${name}_prestart"
 
 clash_prestart()
 {
-	rc_flags="-T ${name} -p ${pidfile} ${procname} -d ${clash_config_dir} ${rc_flags}"
+ rc_flags="-T ${name} -p ${pidfile} ${procname} -d ${clash_config_dir} ${rc_flags}"
 }
 
 load_rc_config $name
@@ -205,10 +204,12 @@ You can check log in file `/var/log/daemon.log`
 
 ::: tip
 If you want to change the default config directory add the following lines to /etc/rc.conf :
+
 ```shell
 clash_enable (bool):        Set it to YES to run clash on startup.
                             Default: NO
 clash_config_dir (string):   clash config directory.
                             Default: /usr/loca/etc/clash
 ```
+
 :::

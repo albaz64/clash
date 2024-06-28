@@ -129,3 +129,87 @@ Stop Clash with:
 ```shell
 docker-compose stop
 ```
+
+## FreeBSD rc
+
+通过 `ports(7)` 或 `pkg(8)` 安装 clash
+
+将所需文件复制到 `/usr/local/etc/clash`
+
+```shell
+cp config.yaml /usr/local/etc/clash/
+cp Country.mmdb /usr/local/etc/clash/
+```
+
+在 `/usr/local/etc/rc.d/clash` 处创建 rc 配置文件:
+
+```shell
+#!/bin/sh
+
+# PROVIDE: clash
+# REQUIRE: NETWORKING DAEMON
+# BEFORE: LOGIN
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name=clash
+rcvar=clash_enable
+
+: ${clash_enable="NO"}
+: ${clash_config_dir="/usr/local/etc/clash"}
+
+required_dirs="${clash_config_dir}"
+required_files="${clash_config_dir}/config.yaml ${clash_config_dir}/Country.mmdb"
+
+command="/usr/sbin/daemon"
+procname="/usr/local/bin/${name}"
+pidfile="/var/run/${name}.pid"
+start_precmd="${name}_prestart"
+
+clash_prestart()
+{
+ rc_flags="-T ${name} -p ${pidfile} ${procname} -d ${clash_config_dir} ${rc_flags}"
+}
+
+load_rc_config $name
+run_rc_command "$1"
+```
+
+使脚本可执行:
+
+```shell
+chmod +x /usr/local/etc/rc.d/clash
+```
+
+在系统启动时启动 clashd:
+
+```shell
+service clash enable
+```
+
+立即启动 clashd:
+
+```shell
+service clash onestart
+```
+
+检查 Clash 的状态:
+
+```shell
+service clash status
+```
+
+你可以在文件 `/var/log/daemon.log` 中查看日志
+
+::: tip
+如果你想更改默认配置目录，请在 /etc/rc.conf 中添加以下行:
+
+```shell
+clash_enable (bool):        设置为 YES 以在启动时运行 clash。
+                            默认值: NO
+clash_config_dir (string):  clash 配置目录。
+                            默认值: /usr/local/etc/clash
+```
+
+:::
